@@ -1,0 +1,247 @@
+Nonterminals useless in grammar
+
+   Function
+   Declartions
+   Declartion
+   Statements
+   Statement
+   Bool_exp
+   Relation_and_expr
+   Relation_expr_inv
+   Relation_expr
+   Comp
+   Expression
+   Expressions
+   Mutiplicative_expr
+   Term
+   FuncIdent
+   Ident
+   Idents
+   Vars
+   Var
+
+
+Terminals unused in grammar
+
+   IDENT
+   NUMBER
+   FUNCTION
+   BEGIN_PARAMS
+   END_PARAMS
+   BEGIN_LOCALS
+   END_LOCALS
+   BEGIN_BODY
+   END_BODY
+   INTEGER
+   ARRAY
+   OF
+   IF
+   THEN
+   ENDIF
+   ELSE
+   WHILE
+   DO
+   BEGINLOOP
+   ENDLOOP
+   CONTINUE
+   READ
+   WRITE
+   TRUE
+   FALSE
+   SEMICOLON
+   COLON
+   RETURN
+   COMMA
+   L_PAREN
+   R_PAREN
+   L_SQUARE_BRACKET
+   R_SQUARE_BRACKET
+   MULT
+   DIV
+   MOD
+   PLUS
+   MINUS
+   LT
+   LTE
+   GT
+   GTE
+   EQ
+   NEQ
+   NOT
+   AND
+   OR
+   ASSIGN
+
+
+Rules useless in grammar
+
+    2 prog_start: Function prog_start
+
+    3 Function: Function FuncIdent SEMICOLON BEGIN_PARAMS Declartions END_PARAMS BEGIN_LOCALS Declartions END_LOCALS BEGIN_BODY Statements END_BODY
+
+    4 Declartions: Declartion SEMICOLON Declartions
+    5            | %empty
+
+    6 Declartion: Idents COLON INTEGER
+    7           | Idents COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+
+    8 Statements: Statement SEMICOLON Statements
+    9           | Statement SEMICOLON
+   10           | %empty
+
+   11 Statement: Var ASSIGN Expression
+   12          | IF Bool_exp THEN Statements ENDIF
+   13          | IF Bool_exp THEN Statements ELSE Statements ENDIF
+   14          | WHILE Bool_exp BEGINLOOP Statements ENDLOOP
+   15          | DO BEGINLOOP Statements ENDLOOP WHILE Bool_exp
+   16          | READ Vars
+   17          | WRITE Vars
+   18          | CONTINUE
+   19          | RETURN Expression
+
+   20 Bool_exp: Relation_and_expr
+   21         | Relation_and_expr OR Bool_exp
+
+   22 Relation_and_expr: Relation_expr_inv
+   23                  | Relation_expr_inv AND Relation_and_expr
+
+   24 Relation_expr_inv: NOT Relation_expr_inv
+   25                  | Relation_expr
+
+   26 Relation_expr: Expression Comp Expression
+   27              | TRUE
+   28              | FALSE
+   29              | L_PAREN Bool_exp R_PAREN
+
+   30 Comp: EQ
+   31     | NEQ
+   32     | LT
+   33     | GT
+   34     | LTE
+   35     | GTE
+
+   36 Expression: Mutiplicative_expr
+   37           | Mutiplicative_expr PLUS Expression
+   38           | Mutiplicative_expr MINUS Expression
+
+   39 Expressions: Expression COMMA Expressions
+   40            | %empty
+   41            | Expression
+
+   42 Mutiplicative_expr: Term
+   43                   | Term MULT Mutiplicative_expr
+   44                   | Term DIV Mutiplicative_expr
+   45                   | Term MOD Mutiplicative_expr
+
+   46 Term: Var
+   47     | NUMBER
+   48     | L_PAREN Expression R_PAREN
+   49     | Ident L_PAREN Expressions R_PAREN
+   50     | MINUS Var
+   51     | MINUS NUMBER
+   52     | MINUS L_PAREN Expression R_PAREN
+
+   53 FuncIdent: Ident
+
+   54 Ident: Ident
+
+   55 Idents: Ident
+   56       | Ident COMMA Idents
+
+   57 Vars: Var COMMA Vars
+   58     | Var
+
+   59 Var: Idents
+   60    | Idents L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
+
+
+Grammar
+
+    0 $accept: prog_start $end
+
+    1 prog_start: %empty
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+IDENT (258)
+NUMBER (259)
+FUNCTION (260)
+BEGIN_PARAMS (261)
+END_PARAMS (262)
+BEGIN_LOCALS (263)
+END_LOCALS (264)
+BEGIN_BODY (265)
+END_BODY (266)
+INTEGER (267)
+ARRAY (268)
+OF (269)
+IF (270)
+THEN (271)
+ENDIF (272)
+ELSE (273)
+WHILE (274)
+DO (275)
+BEGINLOOP (276)
+ENDLOOP (277)
+CONTINUE (278)
+READ (279)
+WRITE (280)
+TRUE (281)
+FALSE (282)
+SEMICOLON (283)
+COLON (284)
+RETURN (285)
+COMMA (286)
+L_PAREN (287)
+R_PAREN (288)
+L_SQUARE_BRACKET (289)
+R_SQUARE_BRACKET (290)
+MULT (291)
+DIV (292)
+MOD (293)
+PLUS (294)
+MINUS (295)
+LT (296)
+LTE (297)
+GT (298)
+GTE (299)
+EQ (300)
+NEQ (301)
+NOT (302)
+AND (303)
+OR (304)
+ASSIGN (305)
+
+
+Nonterminals, with rules where they appear
+
+$accept (51)
+    on left: 0
+prog_start (52)
+    on left: 1, on right: 0
+
+
+State 0
+
+    0 $accept: . prog_start $end
+
+    $default  reduce using rule 1 (prog_start)
+
+    prog_start  go to state 1
+
+
+State 1
+
+    0 $accept: prog_start . $end
+
+    $end  shift, and go to state 2
+
+
+State 2
+
+    0 $accept: prog_start $end .
+
+    $default  accept
