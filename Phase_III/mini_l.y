@@ -1,4 +1,5 @@
 %{
+    #define YY_NO_INPUT
     #include <stdio.h>
     #include <stdlib.h>
     #include <map>
@@ -8,6 +9,7 @@
     int tempCount = 0;
     int labelCount = 0;
     extern char* yytext;
+    extern int currPos;
     bool mainFunc = false;
     std::set<std::string> funcs;
     std::map<std::string, std::string> varTemp;
@@ -24,9 +26,9 @@
     std::string new_temp();
     /*Pahse_2*/
     void yyerror(const char* msg);
-    extern int currLine;
-    extern int currPos;
-    extern FILE* yyin;
+    int yylex();
+//     extern int currLine;
+//     extern FILE* yyin;
 %}
 %union{
     int num_val;
@@ -65,16 +67,16 @@ TRUE FALSE SEMICOLON COLON RETURN COMMA
 prog_start: %empty
         {
                 if(!mainFunc){
-                        printf("No main function declared!\n");
+                     printf("No main function declared!\n");
                 }
         }
-        |Function prog_start
+        | Function prog_start
         { 
         }
   
       ;
 
-Function:   Function FuncIdent SEMICOLON BEGIN_PARAMS Declartions END_PARAMS BEGIN_LOCALS Declartions END_LOCALS BEGIN_BODY Statements END_BODY
+Function:   FUNCTION FuncIdent SEMICOLON BEGIN_PARAMS Declartions END_PARAMS BEGIN_LOCALS Declartions END_LOCALS BEGIN_BODY Statements END_BODY
             {
                     std::string temp = "func ";
                     temp.append($2.place);
@@ -130,9 +132,9 @@ Declartion: Idents COLON INTEGER
                     bool ex = false;
                     while(!ex){
                         right = parse.find("|",left);
-                        temp.append(".");
+                        temp.append(". ");
                         if(right == std::string::npos){
-                                std::string ident = parse.substr(left,right);
+                                std::string ident = parse.substr(left, right);
                                 if(reserved.find(ident) != reserved.end()){
                                         printf("Identifier %s's name is a reserved word. \n",ident.c_str());
                                 }
@@ -163,8 +165,8 @@ Declartion: Idents COLON INTEGER
                         }
                         temp.append("\n");
                     }
-                    $$.code strdup(temp.c_str());
-                    $$.place strdup("");
+                    $$.code = strdup(temp.c_str());
+                    $$.place  = strdup("");
             }
 /*changed identifiers to Idents*/
     |       Idents COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
@@ -233,12 +235,6 @@ Statements: Statement SEMICOLON Statements
             {
                     $$.code = strdup($1.code);
             }
-     |        %empty
-            {
-                    $$.code = strdup("");
-                    $$.place = strdup("");
-            }
-            
     ;
 Statement:  Var ASSIGN Expression
             {
@@ -301,15 +297,16 @@ Statement:  Var ASSIGN Expression
                     std::string first = new_label();
                     std::string after = new_label();
                     std::string temp;
+                    std::string code = $4.code;
                     size_t pos = code.find("continue");
                     while(pos != std::string::npos){
-                            code.replace(pos,8,":= ",+begin;
+                            code.replace(pos,8,":= " +begin);
                             pos = code.find("continue");
                     }
                     temp.append(": ");
                     temp += begin + "\n";
                     temp.append($2.code);
-                    temp += "?:=" first + ", ";
+                    temp += "?:=" + first + ", ";
                     temp.append($2.place);
                     temp.append("\n");
                     temp += ":= " + after + "\n";
@@ -324,9 +321,10 @@ Statement:  Var ASSIGN Expression
                     std::string begin = new_label();
                     std::string after = new_label();
                     std::string temp;
+                    std::string code = $3.code;
                     size_t pos = code.find("continue");
                     while(pos != std::string::npos){
-                        code.replace(pos,8,":= ",+after);
+                        code.replace(pos,8,":= " + after);
                         pos = code.find("continue");
                     }
                     temp.append(": ");
@@ -549,19 +547,13 @@ Expression:         Mutiplicative_expr
 Expressions:        Expression COMMA Expressions
                     {
                             std::string temp;
-                            temp.append($1.code):
-                            temp.append('param ');
+                            temp.append($1.code);
+                            temp.append("param ");
                             temp.append($1.place);
                             temp.append("\n");
                             temp.append($3.code);
                             $$.code = strdup(temp.c_str());
                             $$.place = strdup("");
-                    }
-        |          %empty
-                    {
-                            $$.code = strdup("empty");
-                            $$.place = strdup("empty");
-
                     }
         |           Expression
                     {
@@ -717,7 +709,7 @@ Term:               Var
                             if(varTemp.find($2.place) != varTemp.end()){
                                     varTemp[$2.place] = dst;
                             }
-                            temp += "* " + dst + ", " dst + ", -1\n";
+                            temp += "* " + dst + ", " + dst + ", -1\n";
                             $$.code = strdup(temp.c_str());
                             $$.place = strdup(dst.c_str());
                     }
@@ -746,22 +738,22 @@ Term:               Var
                     }
         ;
 /*Added FuncIdent */
-FuncIdent:      Ident
+FuncIdent:      IDENT
                 {
-                        if(funcs.find($1.place) != funcs.end()){
+                        if(funcs.find($1) != funcs.end()){
                                 printf("function name %s already declared.\n",$1);
                         }
                         else{
-                                funcs.insert($1)
+                                funcs.insert($1);
                         }
                         $$.place = strdup($1);
                         $$.code = strdup("");
                 }
         ;
 /*changed ident to Ident*/
-Ident:              Ident
+Ident:              IDENT
                     {
-                            $$.place = strdup($1.place);
+                            $$.place = strdup($1);
                             $$.code = strdup("");
                     }
         ;
@@ -814,7 +806,7 @@ Vars:               Var COMMA Vars
                     }
         ;
 //changed identifiers to Idents
-Var:                Idents
+Var:                Ident
                      {
                              std::string temp;
                              std::string ident = $1.place;
@@ -829,7 +821,7 @@ Var:                Idents
                              $$.arr = false;
                      }
 //changed identifiers to Idents
-        |            Idents L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
+        |            Ident L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
                      {
                              std::string temp;
                              std::string ident = $1.place;
@@ -849,20 +841,10 @@ Var:                Idents
                      }
         
 %%
-int main(int argc, char **argv){
-        if(argc > 1){
-                yyin = fopen(argv[1], "r");
-                if(yyin == NULL){
-                        printf("syntax: %s filename", argv[0]);
-                        exit(1);
-                }
-        }
-        yyparse();
-        return 0;
-}
+
 void yyerror(const char *msg){
-        extern int yylineno
-        extern char* yytext
+        extern int yylineno;
+        extern char* yytext;
         printf("%s on line %d at char %d at symbol \"%s\"\n",msg, yylineno,currPos,yytext);
         exit(1);
 }

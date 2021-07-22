@@ -1,5 +1,5 @@
 %{
-    #include "y.tab.h"
+    #include "mini_l.tab.h"
     int yyerror(char* msg);
     int currPos = 1;
     int currLine = 1;

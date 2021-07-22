@@ -578,7 +578,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "mini_l.lex"
 #line 2 "mini_l.lex"
-    #include "y.tab.h"
+    #include "mini_l.tab.h"
     int yyerror(char* msg);
     int currPos = 1;
     int currLine = 1;
