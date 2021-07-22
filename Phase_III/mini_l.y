@@ -125,13 +125,13 @@ Declartions:   Declartion SEMICOLON Declartions
 /*changed identifiers to Idents*/
 Declartion: Idents COLON INTEGER
             {
-                    int left = 0;
-                    int right = 0;
+                    size_t left = 0;
+                    size_t right = 0;
                     std::string parse($1.place);
                     std::string temp;
                     bool ex = false;
                     while(!ex){
-                        right = parse.find("|",left);
+                        right = parse.find("|", left);
                         temp.append(". ");
                         if(right == std::string::npos){
                                 std::string ident = parse.substr(left, right);

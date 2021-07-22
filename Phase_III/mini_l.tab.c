@@ -1385,7 +1385,7 @@ yyreduce:
 #line 68 "mini_l.y" /* yacc.c:1646  */
     {
                 if(!mainFunc){
-                        printf("No main function declared!\n");
+                     printf("No main function declared!\n");
                 }
         }
 #line 1392 "mini_l.tab.c" /* yacc.c:1646  */
@@ -1456,13 +1456,13 @@ yyreduce:
   case 7:
 #line 127 "mini_l.y" /* yacc.c:1646  */
     {
-                    int left = 0;
-                    int right = 0;
+                    size_t left = 0;
+                    size_t right = 0;
                     std::string parse((yyvsp[-2].expression).place);
                     std::string temp;
                     bool ex = false;
                     while(!ex){
-                        right = parse.find("|",left);
+                        right = parse.find("|", left);
                         temp.append(". ");
                         if(right == std::string::npos){
                                 std::string ident = parse.substr(left, right);
